@@ -1,0 +1,21 @@
+import random
+import os
+import re
+def dice_game(*args):
+    num_of_dice = int(input("How many dice do you want to roll between 1 and 2: "))
+    play_again = 'yes'
+    while play_again == 'yes':
+        rand_num = random.randint(1, 12)
+        rand_num2 = random.randint(1, 12)
+        if num_of_dice > 2 or num_of_dice < 1:
+            print("Pick a number between 1 and 2")
+            num_of_dice = int(input("How many dice do you want to roll between 1 and 2: "))
+        if num_of_dice == 2:
+            print("Dice 1: ", rand_num,"Dice 2:",rand_num2, "Total Values: ", rand_num+rand_num2)
+
+        if num_of_dice == 1:
+            print("Dice", rand_num)
+
+        play_again = str(input("Do you want to play again?: "))
+    if play_again != "yes":
+        print("All done")
