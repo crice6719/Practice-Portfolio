@@ -1,0 +1,143 @@
+def addition():
+    value1 = float(input("Give us a number: "))
+    value2 = float(input("Give us a number: "))
+    addition_result = value1 + value2
+    new_result = 0
+    printable_result = 0
+    want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+    if want_to_continue not in ['y', 'n']:
+        print("Please enter y or n")
+        want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?: ")
+    if want_to_continue == 'n':
+        printable_result = addition_result
+        print("Here's your final result: ", printable_result)
+    while want_to_continue == 'y':
+        operator = input("give us an operator: ")
+        if operator not in ['+', '-', '*', '/']:
+            print("Please enter +, -, *, /")
+            operator = input("give us an operator: ")
+        new_value1 = float(input("Give us another number: "))
+        if operator == '+':
+            new_result = addition_result + new_value1
+        if operator == '-':
+            new_result = addition_result - new_value1
+        if operator == '*':
+            new_result = addition_result * new_value1
+        if operator == '/':
+            new_result = addition_result / new_value1
+
+        want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?: ")
+        if want_to_continue == 'n':
+            print("Here's your final result: ", new_result)
+
+def subtraction():
+    value1 =float(input("Give us a number: "))
+    value2 =float(input("Give us a number: "))
+    subtraction_result = value1 - value2
+    want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+    new_result = 0
+    printable_result = 0
+    if want_to_continue not in ['y', 'n']:
+        print("Please enter y or n")
+        want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+    if want_to_continue == 'n':
+        printable_result = subtraction_result
+        print("Here's your final result: ", printable_result)
+    while want_to_continue == 'y':
+        operator = input("give us an operator: ")
+        if operator not in ['+', '-', '*', '/']:
+            print("Please enter +, -, *, /")
+            operator = input("give us an operator: ")
+        new_value1 = float(input("Give us another number: "))
+        if operator == '+':
+            new_result = subtraction_result + new_value1
+        if operator == '-':
+            new_result = subtraction_result - new_value1
+        if operator == '*':
+            new_result = subtraction_result * new_value1
+        if operator == '/':
+            new_result = subtraction_result / new_value1
+
+
+        want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+        if want_to_continue == 'n':
+            print("Here's your final result: ", new_result)
+
+def multiplication():
+    value1 = float(input("Give us a number: "))
+    value2 = float(input("Give us a number: "))
+    multiplication_result = value1 * value2
+    want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+    new_result = 0
+    printable_result = 0
+    if want_to_continue not in ['y', 'n']:
+        print("Please enter y or n")
+        want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+    if want_to_continue == 'n':
+        printable_result = multiplication_result
+        print("Here's your final result: ", printable_result)
+    while want_to_continue == 'y':
+        operator = input("give us an operator: ")
+        if operator not in ['+', '-', '*', '/']:
+            print("Please enter +, -, *, /")
+            operator = input("give us an operator: ")
+        new_value1 = float(input("Give us another number: "))
+        if operator == '+':
+            new_result = multiplication_result + new_value1
+        if operator == '-':
+            new_result = multiplication_result - new_value1
+        if operator == '*':
+            new_result = multiplication_result * new_value1
+        if operator == '/':
+            new_result = multiplication_result / new_value1
+
+        #print(new_result)
+        want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+        if want_to_continue == 'n':
+            print("Here's your final result: ", new_result)
+def division():
+    value1 = float(input("Give us a number: "))
+    value2 = float(input("Give us a number: "))
+    division_result = value1 / value2
+    want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+    new_result = 0
+    printable_result = 0
+    if want_to_continue not in ['y', 'n']:
+        print("Please enter y or n")
+        want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+    if want_to_continue == 'n':
+        printable_result = division_result
+        print("Here's your final result: ", printable_result)
+    while want_to_continue == 'y':
+        operator = input("give us an operator: ")
+        if operator not in ['+', '-', '*', '/']:
+            print("Please enter +, -, *, /")
+            operator = input("give us an operator: ")
+        new_value1 = float(input("Give us another number: "))
+        if operator == '+':
+            new_result = division_result + new_value1
+        if operator == '-':
+            new_result = division_result - new_value1
+        if operator == '*':
+            new_result = division_result * new_value1
+        if operator == '/':
+            new_result = division_result / new_value1
+
+        #print(new_result)
+        want_to_continue = input("Do you want to add, subtract, multiply, or divide another number from your current result?:  ")
+        if want_to_continue == 'n':
+            print("Here's your final result: ", new_result)
+
+desired_operator = input("What to do you want to do to start: add, subtract, multiply, or divide?: ")
+
+if desired_operator not in ['add', 'subtract', 'multiply', 'divide']:
+    print("please pick add, subtract, multiply, or divide")
+    desired_operator = input("What to do you want to do to start: add, subtract, multiply, or divide")
+if desired_operator == 'add':
+    addition()
+if desired_operator == 'subtract':
+    subtraction()
+if desired_operator == 'multiply':
+    multiplication()
+if desired_operator == 'divide':
+    division()
