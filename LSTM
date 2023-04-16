@@ -1,0 +1,109 @@
+import math
+import yfinance as yf
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler 
+from sklearn.model_selection import TimeSeriesSplit
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from fredapi import Fred 
+import keras_tuner as kt 
+from finta import TA 
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+import datetime 
+from datetime import datetime, timedelta
+from tensorflow.python.ops.numpy_ops import np_config
+np_config.enable_numpy_behavior()
+      
+fred_key = '9844e0e13499c4426a0cae456bbfc950'
+fred = Fred(api_key=fred_key) #used to pull data from fred website 
+def fred_dataframe_creator(series, column_name):
+    df = fred.get_series(series)
+    df = pd.DataFrame(df)
+    df = df.rename(columns={0:column_name})
+
+    return df
+
+def fred_dataframe_creator_2(series, column_name, start, end):
+    start = start 
+    end = end 
+    df = fred.get_series(series, observation_start=start, observation_end=end)
+    df = pd.DataFrame(df)
+    df = df.rename(columns={0:column_name})
+
+    return df
+start_date = datetime(1987, 1, 1)
+end_date = datetime(2019, 12, 31)
+ticker = ["EURUSD=X"]
+prices = yf.download(tickers=ticker, start=start_date, end=end_date, interval="1d")
+prices = prices.rename(columns={'Close':'close'})
+prices['ZLEMA'] = TA.ZLEMA(prices, 21)
+prices['STOCH'] = TA.STOCHRSI(prices, 21)
+#prices['ROC'] = TA.ROC(prices, 21)
+prices['RSI'] = TA.RSI(prices, 14)
+#prices['MFI'] = TA.MFI(prices, 21)
+prices['STOCHOSC'] = TA.STC
+scaler = MinMaxScaler(feature_range=(0,1))
+tss = TimeSeriesSplit(n_splits=5)
+prices = prices.dropna()
+data, closes = prices.drop(['Adj Close', 'close'], axis=1), prices['close']
+for train_index, test_index in tss.split(data):
+    X_train, X_test = data.iloc[train_index, :], data.iloc[test_index,:]
+    y_train, y_test = closes.iloc[train_index], closes.iloc[test_index]
+X_train, X_test, y_train, y_test = np.array(X_train),np.array(X_test),np.array(y_train),np.array(y_test)
+X_train_scaled, X_test_scaled, y_train_scaled, y_test_scaled = scaler.fit_transform(X_train), scaler.fit_transform(X_test), scaler.fit_transform(y_train.reshape(-1, 1)), scaler.fit_transform(y_test.reshape(-1, 1))
+print(X_train_scaled.shape, X_test_scaled.shape)
+
+X_train, X_test, y_train, y_test = tf.reshape(X_train_scaled, shape=(3461, 7, 1)), tf.reshape(X_test_scaled, shape=(692, 7, 1)), tf.reshape(y_train_scaled, shape=(3461)), tf.reshape(y_test_scaled, shape=(692))
+print(X_train.shape)
+callbacks = [tf.keras.callbacks.EarlyStopping(monitor="mae", min_delta=0, patience=10, verbose=0, mode=min, baseline=None, restore_best_weights=True)]
+def model_10():
+  tf.random.set_seed(7)
+  model = tf.keras.Sequential([
+
+      tf.keras.layers.LSTM(100, return_sequences=True),
+      tf.keras.layers.LSTM(100, return_sequences=True),
+      tf.keras.layers.LSTM(100, return_sequences=False), 
+      tf.keras.layers.Dropout(0.2), 
+      tf.keras.layers.Flatten(), 
+      tf.keras.layers.Dense(1)
+  ])
+  model.compile(loss=tf.keras.losses.mae, 
+                               optimizer = tf.keras.optimizers.Adam(), 
+                               metrics = ["mae", "mse"])
+  return model 
+model = model_10()
+model.fit(X_train, y_train, epochs=200, callbacks=callbacks)
+
+preds = model.predict(X_test)
+preds = scaler.inverse_transform(preds)
+y_test_inv = tf.reshape(y_test, shape=(-1, 1))
+y_test_inv = scaler.inverse_transform(y_test_inv)
+results = pd.DataFrame({'y': y_test_inv.flatten(), 'pred': preds.flatten(), 'diff': ((y_test_inv.flatten()) - (preds.flatten()))})
+print(results)
+new_start = datetime(2021, 1, 1)
+new_end = datetime.now()
+new_prices = yf.download(tickers=ticker, start=new_start, end=new_end, interval="1d")
+new_prices = new_prices.rename(columns={'Close':'close'})
+new_prices['ZLEMA'] = TA.ZLEMA(new_prices, 21)
+new_prices['STOCH'] = TA.STOCHRSI(new_prices, 21)
+#new_prices['ROC'] = TA.ROC(new_prices, 21)
+new_prices['RSI'] = TA.RSI(new_prices, 14)
+#new_prices['MFI'] = TA.MFI(new_prices, 21)
+scaler = MinMaxScaler(feature_range=(0,1))
+tss = TimeSeriesSplit(n_splits=5)
+new_prices = new_prices.dropna()
+new_data, new_closes = new_prices.drop(['Adj Close', 'close'], axis=1), new_prices['close']
+for train_index, test_index in tss.split(new_data):
+    new_X_train, new_X_test = new_data.iloc[train_index, :], new_data.iloc[test_index,:]
+    new_y_train, new_y_test = new_closes.iloc[train_index], new_closes.iloc[test_index]
+new_X_train, new_X_test, new_y_train, new_y_test = np.array(new_X_train),np.array(new_X_test),np.array(new_y_train),np.array(new_y_test)
+new_X_train_scaled, new_X_test_scaled, new_y_train_scaled, new_y_test_scaled = scaler.fit_transform(new_X_train), scaler.fit_transform(new_X_test), scaler.fit_transform(new_y_train.reshape(-1, 1)), scaler.fit_transform(new_y_test.reshape(-1, 1))
+print(new_X_train_scaled.shape, new_X_test_scaled.shape)
+new_X_train, new_X_test, new_y_train, new_y_test = tf.reshape(new_X_train_scaled, shape=(485, 7, 1)), tf.reshape(new_X_test_scaled, shape=(97, 7, 1)), tf.reshape(new_y_train_scaled, shape=(485)), tf.reshape(new_y_test_scaled, shape=(97))
+new_preds = model.predict(new_X_test[-1:])
+new_preds = scaler.inverse_transform(new_preds)
+print(new_preds)
